@@ -13,6 +13,9 @@ export class Barcodes {
   @Column({ default: false })
   checked: boolean;
 
+  @Column({ default: 0 })
+  counter: number;
+
   @CreateDateColumn()
   createdAt: Date;
 

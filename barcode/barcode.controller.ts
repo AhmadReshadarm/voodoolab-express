@@ -45,11 +45,29 @@ export class BarcodeController {
         resp.status(HttpStatus.NOT_FOUND).json('Not authentic');
         return;
       }
+      if (barcode.counter < 11) {
+        if (barcode.checked) {
+          barcode.counter = barcode.counter + 1;
+          const checked = await this.barcodeService.updateBarcode(barcode.id, { ...barcode });
+          resp.status(HttpStatus.FORBIDDEN).json(checked);
+          return;
+        }
+        barcode.checked = true;
+        barcode.counter = barcode.counter + 1;
+        const checked = await this.barcodeService.updateBarcode(barcode.id, { ...barcode });
+        resp.status(HttpStatus.OK).json(checked);
+        return;
+      }
+      if (barcode.counter >= 11) {
+        resp.status(HttpStatus.TOO_MANY_REQUESTS).json(barcode);
+        return;
+      }
       if (barcode.checked) {
-        resp.status(HttpStatus.FORBIDDEN).json('Already used');
+        resp.status(HttpStatus.FORBIDDEN).json(barcode);
         return;
       }
       barcode.checked = true;
+      barcode.counter = barcode.counter + 1;
       const checked = await this.barcodeService.updateBarcode(barcode.id, { ...barcode });
       resp.status(HttpStatus.OK).json(checked);
     } catch (error) {
@@ -86,7 +104,7 @@ export class BarcodeController {
             strict: true,
           });
           const payload = {
-            code: `${startsWith}${generatedBarcode}`,
+            code: `${startsWith}${generatedBarcode.toUpperCase()}`,
             checked: false,
           };
           const barcode = await this.barcodeService.getBarcodeByCode(payload.code);
