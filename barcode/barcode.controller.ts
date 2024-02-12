@@ -99,7 +99,7 @@ export class BarcodeController {
             length: 9,
             numbers: true,
             // symbols: true,
-            // uppercase: true,
+            // uppercase: false,
             excludeSimilarCharacters: true,
             strict: true,
           });
